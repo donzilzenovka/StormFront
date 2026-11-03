@@ -21,7 +21,7 @@ public final class WetSurfaceRenderer {
     private float updateWetness(World world, boolean raining) {
         if (world != lastWorld) {
             lastWorld = world;
-            wetness = raining ? 1.0F : 0.0F;
+            wetness = 0.0F;
             dryingDelayRemaining = 0.0F;
             lastFrameNanos = 0L;
         }
@@ -29,12 +29,15 @@ public final class WetSurfaceRenderer {
         float elapsed = lastFrameNanos == 0L ? 0.0F : Math.min(0.25F, (now - lastFrameNanos) / 1000000000.0F);
         lastFrameNanos = now;
         if (raining) {
-            wetness = 1.0F;
+            wetness = Math.min(1.0F, wetness + elapsed / StormConfig.wetRiseSeconds);
             dryingDelayRemaining = StormConfig.wetDryDelaySeconds;
-        } else if (dryingDelayRemaining > 0.0F) {
-            dryingDelayRemaining = Math.max(0.0F, dryingDelayRemaining - elapsed);
         } else {
-            wetness = Math.max(0.0F, wetness - elapsed / StormConfig.wetDryFadeSeconds);
+            float delayUsed = Math.min(elapsed, dryingDelayRemaining);
+            dryingDelayRemaining -= delayUsed;
+            float fadeTime = elapsed - delayUsed;
+            if (fadeTime > 0.0F) {
+                wetness = Math.max(0.0F, wetness - fadeTime / StormConfig.wetDryFadeSeconds);
+            }
         }
         return wetness;
     }
