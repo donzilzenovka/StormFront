@@ -5,7 +5,7 @@ import java.util.List;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.WorldSavedData;
+import net.minecraft.world.WorldSavedData;
 
 public final class StormWorldData extends WorldSavedData {
     public final List<StormCell> cells = new ArrayList<StormCell>();
