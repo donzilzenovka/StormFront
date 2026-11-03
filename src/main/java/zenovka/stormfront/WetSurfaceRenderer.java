@@ -13,6 +13,32 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import org.lwjgl.opengl.GL11;
 
 public final class WetSurfaceRenderer {
+    private World lastWorld;
+    private long lastFrameNanos;
+    private float wetness;
+    private float dryingDelayRemaining;
+
+    private float updateWetness(World world, boolean raining) {
+        if (world != lastWorld) {
+            lastWorld = world;
+            wetness = raining ? 1.0F : 0.0F;
+            dryingDelayRemaining = 0.0F;
+            lastFrameNanos = 0L;
+        }
+        long now = System.nanoTime();
+        float elapsed = lastFrameNanos == 0L ? 0.0F : Math.min(0.25F, (now - lastFrameNanos) / 1000000000.0F);
+        lastFrameNanos = now;
+        if (raining) {
+            wetness = 1.0F;
+            dryingDelayRemaining = StormConfig.wetDryDelaySeconds;
+        } else if (dryingDelayRemaining > 0.0F) {
+            dryingDelayRemaining = Math.max(0.0F, dryingDelayRemaining - elapsed);
+        } else {
+            wetness = Math.max(0.0F, wetness - elapsed / StormConfig.wetDryFadeSeconds);
+        }
+        return wetness;
+    }
+
     // This is a deliberately simple, bounded visual prototype, not a chunk recolour.
     @SubscribeEvent
     public void render(RenderWorldLastEvent event) {
@@ -20,7 +46,9 @@ public final class WetSurfaceRenderer {
         Minecraft mc = Minecraft.getMinecraft();
         if (mc.theWorld == null || mc.renderViewEntity == null) return;
         World world = mc.theWorld;
-        if (!world.isRaining() || world.getRainStrength(event.partialTicks) <= 0.01F) return;
+        boolean raining = world.isRaining() && world.getRainStrength(event.partialTicks) > 0.01F;
+        float wetnessFactor = updateWetness(world, raining);
+        if (wetnessFactor <= 0.0F) return;
 
         int radius = StormConfig.wetRadius;
         int cx = (int)Math.floor(mc.renderViewEntity.posX);
@@ -64,10 +92,10 @@ public final class WetSurfaceRenderer {
                 // Linear fade at the perimeter prevents a hard square following the camera.
                 // Inside the perimeter, every rain shower produces the same full wetness.
                 double surface = y + 0.003;
-                vertex(t, x, surface, z, cx, cz, radius);
-                vertex(t, x, surface, z + 1, cx, cz, radius);
-                vertex(t, x + 1, surface, z + 1, cx, cz, radius);
-                vertex(t, x + 1, surface, z, cx, cz, radius);
+                vertex(t, x, surface, z, cx, cz, radius, wetnessFactor);
+                vertex(t, x, surface, z + 1, cx, cz, radius, wetnessFactor);
+                vertex(t, x + 1, surface, z + 1, cx, cz, radius, wetnessFactor);
+                vertex(t, x + 1, surface, z, cx, cz, radius, wetnessFactor);
             }
         }
         t.draw();
@@ -90,11 +118,11 @@ public final class WetSurfaceRenderer {
     }
 
     private static void vertex(Tessellator t, double x, double y, double z,
-                               int cx, int cz, int radius) {
+                               int cx, int cz, int radius, float wetnessFactor) {
         double distance = Math.max(Math.abs(x - (cx + 0.5)), Math.abs(z - (cz + 0.5)));
         double fadeWidth = Math.max(2.0, radius * 0.35);
         float fade = (float)Math.max(0.0, Math.min(1.0, (radius + 0.5 - distance) / fadeWidth));
-        t.setColorRGBA_F(0.0F, 0.0F, 0.0F, StormConfig.wetDarkness * fade);
+        t.setColorRGBA_F(0.0F, 0.0F, 0.0F, StormConfig.wetDarkness * wetnessFactor * fade);
         t.addVertex(x, y, z);
     }
 }
