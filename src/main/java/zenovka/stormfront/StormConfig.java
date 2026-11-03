@@ -6,6 +6,7 @@ import net.minecraftforge.common.config.Configuration;
 public final class StormConfig {
     public static int dimension = 0;
     public static boolean wetSurfaces = true;
+    public static boolean wetDiagnostics = false;
     public static int wetRadius = 12;
     public static float wetDarkness = 0.15F;
     public static float wetRiseSeconds = 6.0F;
@@ -25,6 +26,7 @@ public final class StormConfig {
         try {
             cfg.load();
             wetSurfaces = cfg.get("wetness", "enabled", true, "Client-only prototype: darken rain-exposed full-block top faces.").getBoolean(true);
+            wetDiagnostics = cfg.get("wetness", "diagnostics", false, "Show rain strength, wetness, opacity and drying delay in the HUD.").getBoolean(false);
             wetRadius = cfg.get("wetness", "radiusBlocks", 12).getInt(12);
             wetDarkness = (float)cfg.get("wetness", "darkness", 0.15, "Overlay opacity: 0 = invisible, 1 = black.").getDouble(0.15);
             dimension = cfg.get("storm", "dimension", 0).getInt(0);
