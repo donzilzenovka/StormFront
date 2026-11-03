@@ -7,5 +7,6 @@ public final class ClientProxy extends CommonProxy {
         WetSurfaceRenderer renderer = new WetSurfaceRenderer();
         MinecraftForge.EVENT_BUS.register(renderer);
         MinecraftForge.EVENT_BUS.register(new WetnessDiagnostics(renderer));
+        MinecraftForge.EVENT_BUS.register(new WetFootstepSounds(renderer));
     }
 }
