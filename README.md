@@ -18,3 +18,7 @@ Uses RetroFuturaGradle 1.4.9, Java 8 toolchain, Minecraft 1.7.10. Run `gradle bu
 ## Testing status
 
 **Unbuilt prototype:** compilation, dedicated-server startup, and Better Rain coexistence have not yet been verified. Please test in a disposable world before including it in the main modpack. Localized rain rendering is not implemented; the storm cells control additional lightning only.
+
+## Experimental surface wetness
+
+A client-only, full-strength wetness prototype darkens rain-exposed top faces of ordinary full blocks using a transparent black overlay. It uses vanilla precipitation height, requires no extra coremod, and does not change blocks or chunk display lists. Any active rain produces maximum darkness; the effect disappears when rain stops. It does **not** yet support slopes, slabs, stairs, custom renderers, vertical faces, drying, or per-block texture recolouring. The overlay is rendered each frame within a bounded radius, so measure FPS and look for z-fighting. In config category `wetness`, set `enabled=false` to disable; `radiusBlocks=12`, `darkness=0.7` by default. This is untested in-game.
