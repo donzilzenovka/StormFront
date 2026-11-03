@@ -4,6 +4,8 @@ import net.minecraftforge.common.MinecraftForge;
 
 public final class ClientProxy extends CommonProxy {
     @Override public void registerRenderers() {
-        MinecraftForge.EVENT_BUS.register(new WetSurfaceRenderer());
+        WetSurfaceRenderer renderer = new WetSurfaceRenderer();
+        MinecraftForge.EVENT_BUS.register(renderer);
+        MinecraftForge.EVENT_BUS.register(new WetnessDiagnostics(renderer));
     }
 }
