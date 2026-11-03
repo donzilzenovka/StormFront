@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.world.World;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import org.lwjgl.opengl.GL11;
@@ -54,7 +55,7 @@ public final class WetSurfaceRenderer {
                 for (int i = 0; i < 4 && y > 1; i++) {
                     Block aboveGround = world.getBlock(x, y - 1, z);
                     Material material = aboveGround.getMaterial();
-                    if (material != Material.plants && material != Material.vine) break;
+                    if (!isSmallSurfaceObject(world, aboveGround, x, y - 1, z, material)) break;
                     y--;
                 }
                 Block block = world.getBlock(x, y - 1, z);
@@ -72,6 +73,20 @@ public final class WetSurfaceRenderer {
         t.draw();
         GL11.glPopMatrix();
         GL11.glPopAttrib();
+    }
+
+    // Treat small surface clutter as rain-permeable, not every non-full block.
+    // Collision boxes are world-space and can be absent for decorative objects.
+    private static boolean isSmallSurfaceObject(World world, Block block, int x, int y, int z, Material material) {
+        if (material == Material.plants || material == Material.vine) return true;
+        if (block.isOpaqueCube() || block.getMaterial().isLiquid()) return false;
+        AxisAlignedBB box = block.getCollisionBoundingBoxFromPool(world, x, y, z);
+        if (box == null) return true;
+        double width = box.maxX - box.minX;
+        double height = box.maxY - box.minY;
+        double depth = box.maxZ - box.minZ;
+        // Only low, narrow clutter. Full-width slabs and larger structures remain barriers.
+        return height <= 0.375 && width <= 0.75 && depth <= 0.75;
     }
 
     private static void vertex(Tessellator t, double x, double y, double z,
