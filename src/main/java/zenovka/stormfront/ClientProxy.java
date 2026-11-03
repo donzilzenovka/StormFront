@@ -1,6 +1,7 @@
 package zenovka.stormfront;
 
 import net.minecraftforge.common.MinecraftForge;
+import cpw.mods.fml.common.FMLCommonHandler;
 
 public final class ClientProxy extends CommonProxy {
     @Override public void registerRenderers() {
@@ -8,5 +9,6 @@ public final class ClientProxy extends CommonProxy {
         MinecraftForge.EVENT_BUS.register(renderer);
         MinecraftForge.EVENT_BUS.register(new WetnessDiagnostics(renderer));
         MinecraftForge.EVENT_BUS.register(new WetFootstepSounds(renderer));
+        FMLCommonHandler.instance().bus().register(new RainShaderHandler());
     }
 }
