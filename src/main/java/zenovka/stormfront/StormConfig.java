@@ -8,6 +8,7 @@ public final class StormConfig {
     public static boolean wetSurfaces = true;
     public static boolean wetDiagnostics = false;
     public static boolean wetFootsteps = true;
+    public static boolean enableRainShader = false;
     public static boolean wetDigSounds = true;
     public static float wetFootstepVolume = 0.10F;
     public static String[] rainPermeableBlocks = new String[] { "minecraft:cake", "te:gregtech.tileentity.plants.MultiTileEntityBush" };
@@ -31,6 +32,7 @@ public final class StormConfig {
             cfg.load();
             wetSurfaces = cfg.get("wetness", "enabled", true, "Client-only prototype: darken rain-exposed full-block top faces.").getBoolean(true);
             wetDiagnostics = cfg.get("wetness", "diagnostics", false, "Show rain strength, wetness, opacity and drying delay in the HUD.").getBoolean(false);
+            enableRainShader = cfg.get("wetness", "enableRainShader", false, "Use the vanilla antialias post-processing shader while exposed to rain. Client only.").getBoolean(false);
             wetFootsteps = cfg.get("wetness", "footstepSounds", true, "Layer damp steps over existing footsteps near the player.").getBoolean(true);
             wetDigSounds = cfg.get("wetness", "wetDigSounds", true, "Also layer damp sounds over dig.* events.").getBoolean(true);
             wetFootstepVolume = (float)cfg.get("wetness", "footstepVolume", 0.10, "Maximum wet footstep layer volume.").getDouble(0.15);
