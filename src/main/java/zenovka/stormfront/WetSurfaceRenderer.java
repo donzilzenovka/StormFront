@@ -30,7 +30,8 @@ public final class WetSurfaceRenderer {
         lastFrameNanos = now;
         if (rainStrength > 0.0F) {
             // Approach the actual rain-strength target without overshooting.
-            float step = elapsed / StormConfig.wetRiseSeconds;
+            // Match drying: increase actual overlay opacity by 0.025 per second.
+            float step = (0.025F / Math.max(0.001F, StormConfig.wetDarkness)) * elapsed;
             if (wetness < rainStrength) wetness = Math.min(rainStrength, wetness + step);
             else wetness = Math.max(rainStrength, wetness - step);
             dryingDelayRemaining = StormConfig.wetDryDelaySeconds;
