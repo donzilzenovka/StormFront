@@ -7,6 +7,8 @@ public final class StormConfig {
     public static int dimension = 0;
     public static boolean wetSurfaces = true;
     public static boolean wetDiagnostics = false;
+    public static boolean wetFootsteps = true;
+    public static float wetFootstepVolume = 0.15F;
     public static String[] rainPermeableBlocks = new String[] { "minecraft:cake" };
     public static int wetRadius = 12;
     public static float wetDarkness = 0.15F;
@@ -28,6 +30,8 @@ public final class StormConfig {
             cfg.load();
             wetSurfaces = cfg.get("wetness", "enabled", true, "Client-only prototype: darken rain-exposed full-block top faces.").getBoolean(true);
             wetDiagnostics = cfg.get("wetness", "diagnostics", false, "Show rain strength, wetness, opacity and drying delay in the HUD.").getBoolean(false);
+            wetFootsteps = cfg.get("wetness", "footstepSounds", true, "Layer damp steps over existing footsteps near the player.").getBoolean(true);
+            wetFootstepVolume = (float)cfg.get("wetness", "footstepVolume", 0.15, "Maximum wet footstep layer volume.").getDouble(0.15);
             rainPermeableBlocks = cfg.get("wetness", "rainPermeableBlocks", new String[] { "minecraft:cake" },
                 "Block registry IDs that let rain reach the ground below. Use modid:block for all metadata, or modid:block@3 for one metadata value.").getStringList();
             RainPermeability.configure(rainPermeableBlocks);
@@ -48,6 +52,7 @@ public final class StormConfig {
             wetRiseSeconds = Math.max(0.1F, Math.min(300.0F, wetRiseSeconds));
             wetDryDelaySeconds = Math.max(0.0F, Math.min(300.0F, wetDryDelaySeconds));
             wetDryFadeSeconds = Math.max(0.1F, Math.min(600.0F, wetDryFadeSeconds));
+            wetFootstepVolume = Math.max(0.0F, Math.min(1.0F, wetFootstepVolume));
             wetRadius = Math.max(2, Math.min(24, wetRadius));
             wetDarkness = Math.max(0.0F, Math.min(0.95F, wetDarkness));
             maxCells = Math.max(0, Math.min(20, maxCells));
