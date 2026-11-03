@@ -36,7 +36,11 @@ public final class RainShaderHandler {
         int y = (int)Math.floor(camera.posY + camera.getEyeHeight());
         int z = (int)Math.floor(camera.posZ);
         BiomeGenBase biome = world.getBiomeGenForCoords(x, z);
-        boolean exposed = world.isRaining()
+        // Any equipped head-slot item protects the player's view from rain blur.
+        // Vanilla 1.7.10 armorInventory[3] is the helmet slot.
+        boolean wearingHelmet = mc.thePlayer != null
+            && mc.thePlayer.getCurrentArmor(3) != null;
+        boolean exposed = !wearingHelmet && world.isRaining()
             && world.getRainStrength(1.0F) > 0.0F
             && biome != null && biome.canSpawnLightningBolt()
             && !camera.isInsideOfMaterial(net.minecraft.block.material.Material.water)
