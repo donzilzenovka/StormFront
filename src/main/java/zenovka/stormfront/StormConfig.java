@@ -8,8 +8,9 @@ public final class StormConfig {
     public static boolean wetSurfaces = true;
     public static int wetRadius = 12;
     public static float wetDarkness = 0.15F;
+    public static float wetRiseSeconds = 6.0F;
     public static float wetDryDelaySeconds = 10.0F;
-    public static float wetDryFadeSeconds = 30.0F;
+    public static float wetDryFadeSeconds = 8.0F;
     public static int maxCells = 3;
     public static int spawnInterval = 1200;
     public static int minRadius = 96;
@@ -35,8 +36,10 @@ public final class StormConfig {
             maxLifetime = cfg.get("storm", "maxLifetimeTicks", 9000).getInt(9000);
             strikesPerMinute = cfg.get("lightning", "strikesPerMinuteAtFullIntensityPerCell", 1.5).getDouble(1.5);
             attemptsPerStrike = cfg.get("lightning", "placementAttempts", 8).getInt(8);
+            wetRiseSeconds = (float)cfg.get("wetness", "wetRiseSeconds", 6.0, "Seconds for wetness to rise linearly from zero to maximum.").getDouble(6.0);
             wetDryDelaySeconds = (float)cfg.get("wetness", "dryDelaySeconds", 10.0, "Seconds to remain fully wet after rain ends.").getDouble(10.0);
-            wetDryFadeSeconds = (float)cfg.get("wetness", "dryFadeSeconds", 30.0, "Seconds to fade linearly to dry.").getDouble(30.0);
+            wetDryFadeSeconds = (float)cfg.get("wetness", "dryFadeSeconds", 8.0, "Seconds to fade linearly to dry.").getDouble(8.0);
+            wetRiseSeconds = Math.max(0.1F, Math.min(300.0F, wetRiseSeconds));
             wetDryDelaySeconds = Math.max(0.0F, Math.min(300.0F, wetDryDelaySeconds));
             wetDryFadeSeconds = Math.max(0.1F, Math.min(600.0F, wetDryFadeSeconds));
             wetRadius = Math.max(2, Math.min(24, wetRadius));
