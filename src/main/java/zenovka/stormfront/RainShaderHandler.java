@@ -16,19 +16,26 @@ public final class RainShaderHandler {
         new ResourceLocation("minecraft", "shaders/post/antialias.json");
     private ShaderGroup ownedShader;
     private World shaderWorld;
+    private int exposedTicks;
+    private int shelteredTicks;
+    private static final int TRANSITION_TICKS = 5;
 
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
         Minecraft mc = Minecraft.getMinecraft();
         if (!StormConfig.enableRainShader || mc.theWorld == null || mc.renderViewEntity == null) {
+            exposedTicks = shelteredTicks = 0;
             release(mc);
             return;
         }
 
         World world = mc.theWorld;
         Entity camera = mc.renderViewEntity;
-        if (shaderWorld != null && shaderWorld != world) release(mc);
+        if (shaderWorld != null && shaderWorld != world) {
+            release(mc);
+            exposedTicks = shelteredTicks = 0;
+        }
 
         int x = (int)Math.floor(camera.posX);
         int y = (int)Math.floor(camera.posY + camera.getEyeHeight());
@@ -41,10 +48,20 @@ public final class RainShaderHandler {
             && !world.getBlock(x, y, z).getMaterial().isLiquid()
             && isRainExposed(world, x, y, z);
 
+        // Debounce transitions at block edges and under vegetation. A single
+        // inconsistent precipitation-height sample should not rebuild a shader.
+        if (exposed) {
+            exposedTicks = Math.min(TRANSITION_TICKS, exposedTicks + 1);
+            shelteredTicks = 0;
+        } else {
+            shelteredTicks = Math.min(TRANSITION_TICKS, shelteredTicks + 1);
+            exposedTicks = 0;
+        }
         if (!exposed) {
-            release(mc);
+            if (shelteredTicks >= TRANSITION_TICKS) release(mc);
             return;
         }
+        if (ownedShader == null && exposedTicks < TRANSITION_TICKS) return;
 
         // Do not replace a shader belonging to HeavySwing or another mod.
         if (ownedShader != null && mc.entityRenderer.theShaderGroup != ownedShader) {
