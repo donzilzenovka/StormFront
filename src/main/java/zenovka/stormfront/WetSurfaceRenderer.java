@@ -114,7 +114,7 @@ public final class WetSurfaceRenderer {
                 for (int i = 0; i < 4 && y > 1; i++) {
                     Block aboveGround = world.getBlock(x, y - 1, z);
                     Material material = aboveGround.getMaterial();
-                    if (!RainPermeability.matches(aboveGround, world.getBlockMetadata(x, y - 1, z))
+                    if (!RainPermeability.matches(world, x, y - 1, z, aboveGround, world.getBlockMetadata(x, y - 1, z))
                             && !isSmallSurfaceObject(world, aboveGround, x, y - 1, z, material)) break;
                     y--;
                 }
