@@ -1,0 +1,31 @@
+{
+  "wet_step": {
+    "category": "player",
+    "sounds": [
+      {
+        "name": "stormfront:wet_step_1",
+        "stream": false
+      },
+      {
+        "name": "stormfront:wet_step_2",
+        "stream": false
+      },
+      {
+        "name": "stormfront:wet_step_3",
+        "stream": false
+      },
+      {
+        "name": "stormfront:wet_step_4",
+        "stream": false
+      },
+      {
+        "name": "stormfront:wet_step_5",
+        "stream": false
+      },
+      {
+        "name": "stormfront:wet_step_6",
+        "stream": false
+      }
+    ]
+  }
+}
