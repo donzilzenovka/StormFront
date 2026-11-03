@@ -8,7 +8,8 @@ public final class StormConfig {
     public static boolean wetSurfaces = true;
     public static boolean wetDiagnostics = false;
     public static boolean wetFootsteps = true;
-    public static float wetFootstepVolume = 0.15F;
+    public static boolean wetDigSounds = true;
+    public static float wetFootstepVolume = 0.10F;
     public static String[] rainPermeableBlocks = new String[] { "minecraft:cake" };
     public static int wetRadius = 12;
     public static float wetDarkness = 0.15F;
@@ -31,7 +32,8 @@ public final class StormConfig {
             wetSurfaces = cfg.get("wetness", "enabled", true, "Client-only prototype: darken rain-exposed full-block top faces.").getBoolean(true);
             wetDiagnostics = cfg.get("wetness", "diagnostics", false, "Show rain strength, wetness, opacity and drying delay in the HUD.").getBoolean(false);
             wetFootsteps = cfg.get("wetness", "footstepSounds", true, "Layer damp steps over existing footsteps near the player.").getBoolean(true);
-            wetFootstepVolume = (float)cfg.get("wetness", "footstepVolume", 0.15, "Maximum wet footstep layer volume.").getDouble(0.15);
+            wetDigSounds = cfg.get("wetness", "wetDigSounds", true, "Also layer damp sounds over dig.* events.").getBoolean(true);
+            wetFootstepVolume = (float)cfg.get("wetness", "footstepVolume", 0.10, "Maximum wet footstep layer volume.").getDouble(0.15);
             rainPermeableBlocks = cfg.get("wetness", "rainPermeableBlocks", new String[] { "minecraft:cake" },
                 "Block registry IDs that let rain reach the ground below. Use modid:block for all metadata, or modid:block@3 for one metadata value.").getStringList();
             RainPermeability.configure(rainPermeableBlocks);
