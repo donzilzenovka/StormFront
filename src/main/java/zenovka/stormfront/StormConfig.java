@@ -7,7 +7,7 @@ public final class StormConfig {
     public static int dimension = 0;
     public static boolean wetSurfaces = true;
     public static int wetRadius = 12;
-    public static float wetDarkness = 0.7F;
+    public static float wetDarkness = 0.35F;
     public static int maxCells = 3;
     public static int spawnInterval = 1200;
     public static int minRadius = 96;
@@ -23,7 +23,7 @@ public final class StormConfig {
             cfg.load();
             wetSurfaces = cfg.get("wetness", "enabled", true, "Client-only prototype: darken rain-exposed full-block top faces.").getBoolean(true);
             wetRadius = cfg.get("wetness", "radiusBlocks", 12).getInt(12);
-            wetDarkness = (float)cfg.get("wetness", "darkness", 0.7, "Overlay opacity: 0 = invisible, 1 = black.").getDouble(0.7);
+            wetDarkness = (float)cfg.get("wetness", "darkness", 0.35, "Overlay opacity: 0 = invisible, 1 = black.").getDouble(0.35);
             dimension = cfg.get("storm", "dimension", 0).getInt(0);
             maxCells = cfg.get("storm", "maxCells", 3).getInt(3);
             spawnInterval = cfg.get("storm", "spawnIntervalTicks", 1200).getInt(1200);
