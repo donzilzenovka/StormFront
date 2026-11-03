@@ -1,2 +1,2 @@
 # StormFront
-Lightning storms utilising Better rain
+Lightning storms utilising Better rain.
