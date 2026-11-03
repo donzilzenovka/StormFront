@@ -12,7 +12,7 @@ public final class StormConfig {
     public static float wetFootstepVolume = 0.10F;
     public static String[] rainPermeableBlocks = new String[] { "minecraft:cake", "te:gregtech.tileentity.plants.MultiTileEntityBush" };
     public static int wetRadius = 12;
-    public static float wetDarkness = 0.15F;
+    public static float wetDarkness = 0.20F;
     public static float wetRiseSeconds = 6.0F;
     public static float wetDryDelaySeconds = 10.0F;
     public static float wetDryFadeSeconds = 8.0F;
@@ -38,7 +38,7 @@ public final class StormConfig {
                 "Rain-permeable blocks: modid:block (all metadata), modid:block@3 (one metadata), or te:fully.qualified.TileEntityClass (exact tile-entity class; e.g. GT6 berry bushes). Existing config files need the te: entry added manually.").getStringList();
             RainPermeability.configure(rainPermeableBlocks);
             wetRadius = cfg.get("wetness", "radiusBlocks", 12).getInt(12);
-            wetDarkness = (float)cfg.get("wetness", "darkness", 0.15, "Overlay opacity: 0 = invisible, 1 = black.").getDouble(0.15);
+            wetDarkness = (float)cfg.get("wetness", "darkness", 0.20, "Overlay opacity: 0 = invisible, 1 = black.").getDouble(0.20);
             dimension = cfg.get("storm", "dimension", 0).getInt(0);
             maxCells = cfg.get("storm", "maxCells", 3).getInt(3);
             spawnInterval = cfg.get("storm", "spawnIntervalTicks", 1200).getInt(1200);
