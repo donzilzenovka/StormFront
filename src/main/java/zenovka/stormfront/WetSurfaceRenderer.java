@@ -39,7 +39,9 @@ public final class WetSurfaceRenderer {
             dryingDelayRemaining -= delayUsed;
             float fadeTime = elapsed - delayUsed;
             if (fadeTime > 0.0F) {
-                wetness = Math.max(0.0F, wetness - fadeTime / StormConfig.wetDryFadeSeconds);
+                // Fade at 0.025 actual overlay opacity per second, independent of rain strength.
+                float normalizedStep = (0.025F / Math.max(0.001F, StormConfig.wetDarkness)) * fadeTime;
+                wetness = Math.max(0.0F, wetness - normalizedStep);
             }
         }
         return wetness;
