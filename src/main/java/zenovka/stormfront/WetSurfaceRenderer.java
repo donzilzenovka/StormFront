@@ -18,7 +18,7 @@ public final class WetSurfaceRenderer {
     private float wetness;
     private float dryingDelayRemaining;
 
-    private float updateWetness(World world, boolean raining) {
+    private float updateWetness(World world, float rainStrength) {
         if (world != lastWorld) {
             lastWorld = world;
             wetness = 0.0F;
@@ -28,8 +28,11 @@ public final class WetSurfaceRenderer {
         long now = System.nanoTime();
         float elapsed = lastFrameNanos == 0L ? 0.0F : Math.min(0.25F, (now - lastFrameNanos) / 1000000000.0F);
         lastFrameNanos = now;
-        if (raining) {
-            wetness = Math.min(1.0F, wetness + elapsed / StormConfig.wetRiseSeconds);
+        if (rainStrength > 0.0F) {
+            // Approach the actual rain-strength target without overshooting.
+            float step = elapsed / StormConfig.wetRiseSeconds;
+            if (wetness < rainStrength) wetness = Math.min(rainStrength, wetness + step);
+            else wetness = Math.max(rainStrength, wetness - step);
             dryingDelayRemaining = StormConfig.wetDryDelaySeconds;
         } else {
             float delayUsed = Math.min(elapsed, dryingDelayRemaining);
@@ -49,8 +52,8 @@ public final class WetSurfaceRenderer {
         Minecraft mc = Minecraft.getMinecraft();
         if (mc.theWorld == null || mc.renderViewEntity == null) return;
         World world = mc.theWorld;
-        boolean raining = world.isRaining() && world.getRainStrength(event.partialTicks) > 0.01F;
-        float wetnessFactor = updateWetness(world, raining);
+        float rainStrength = world.isRaining() ? Math.max(0.0F, Math.min(1.0F, world.getRainStrength(event.partialTicks))) : 0.0F;
+        float wetnessFactor = updateWetness(world, rainStrength);
         if (wetnessFactor <= 0.0F) return;
 
         int radius = StormConfig.wetRadius;
