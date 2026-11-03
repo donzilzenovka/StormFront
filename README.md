@@ -1,24 +1,20 @@
 # StormFront
 
-Localized lightning storm simulation for Minecraft Forge 1.7.10, inspired by Bigger Lightning Storms and designed to coexist with Better Rain.
+Forge 1.7.10 server-side localized lightning simulation, inspired by Bigger Lightning Storms. Designed to coexist with Better Rain 0.15 without touching its renderer, sound or coremod.
 
-## Design
+## Prototype 0.1.0
 
-- Preserve vanilla dimension-wide rain and thunder lifecycle.
-- Leave Better Rain in charge of rain visuals, sound, and its own weather effects; no coremod modifications.
-- Simulate drifting server-side storm cells during vanilla thunderstorms, concentrating lightning near storm centres.
-- Strike only in already-loaded chunks and suitable biomes; never load terrain solely to generate lightning.
-- Keep storm state per dimension, persist it through world saves, and limit work per tick.
-- Run on dedicated servers; Better Rain integration must be optional.
+- Vanilla dimension-wide weather remains authoritative; cells only exist during thunderstorms.
+- Up to three drifting storm cells are simulated in the Overworld by default.
+- Each cell has a position, radius, velocity, lifetime and intensity ramp/decay.
+- Lightning is attempted in loaded chunks only, in lightning-capable biomes, using vanilla weather entities.
+- Storm cells persist via world saved data; the config file controls generation and lightning rate.
+- All simulation runs on the logical server. Better Rain is optional, with no direct class linkage.
 
-## Planned modules
+## Build
 
-- `StormManager`: formation, movement, and dissipation.
-- `StormCell`: position, radius, intensity, and velocity.
-- `LightningController`: loaded-chunk-aware strikes and rate limits.
-- `StormWorldData`: persistent world state.
-- `StormConfig`: tunable settings.
+Uses RetroFuturaGradle 1.4.9, Java 8 toolchain, Minecraft 1.7.10. Run `gradle build` with a compatible Gradle installation. Gradle wrapper is not yet included.
 
-## Status
+## Testing status
 
-Architecture documented; implementation and compatibility testing remain to be done.
+**Unbuilt prototype:** compilation, dedicated-server startup, and Better Rain coexistence have not yet been verified. Please test in a disposable world before including it in the main modpack. Localized rain rendering is not implemented; the storm cells control additional lightning only.
