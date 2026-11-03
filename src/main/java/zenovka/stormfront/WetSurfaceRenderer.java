@@ -2,6 +2,7 @@ package zenovka.stormfront;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockBush;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
@@ -116,7 +117,7 @@ public final class WetSurfaceRenderer {
                     y--;
                 }
                 Block block = world.getBlock(x, y - 1, z);
-                if (block == null || !block.isOpaqueCube() || block.getRenderType() != 0) continue;
+                if (block == null || !block.isOpaqueCube()) continue;
 
                 // Linear fade at the perimeter prevents a hard square following the camera.
                 // Inside the perimeter, every rain shower produces the same full wetness.
@@ -135,7 +136,14 @@ public final class WetSurfaceRenderer {
     // Treat small surface clutter as rain-permeable, not every non-full block.
     // Collision boxes are world-space and can be absent for decorative objects.
     private static boolean isSmallSurfaceObject(World world, Block block, int x, int y, int z, Material material) {
-        if (material == Material.plants || material == Material.vine) return true;
+        if (material == Material.plants || material == Material.vine || block instanceof BlockBush) return true;
+        // Some modded berry bushes use non-plant materials and oversized collision boxes.
+        // Keep this narrow: it only affects blocks whose registered ID identifies a berry bush.
+        Object registeredName = Block.blockRegistry.getNameForObject(block);
+        if (registeredName != null) {
+            String name = registeredName.toString().toLowerCase(java.util.Locale.ROOT);
+            if (name.contains("berry") && (name.contains("bush") || name.contains("shrub"))) return true;
+        }
         if (block.isOpaqueCube() || block.getMaterial().isLiquid()) return false;
         AxisAlignedBB box = block.getCollisionBoundingBoxFromPool(world, x, y, z);
         if (box == null) return true;
