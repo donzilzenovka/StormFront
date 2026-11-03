@@ -14,6 +14,19 @@ import org.lwjgl.opengl.GL11;
 
 public final class WetSurfaceRenderer {
     private World lastWorld;
+    private float diagnosticRainStrength;
+    private float diagnosticWetness;
+    private float diagnosticOpacity;
+    private float diagnosticDelay;
+    private boolean diagnosticRainFlag;
+
+    public String[] diagnostics() {
+        return new String[] {
+            String.format(java.util.Locale.ROOT, "StormFront rainFlag=%s strength=%.4f", diagnosticRainFlag, diagnosticRainStrength),
+            String.format(java.util.Locale.ROOT, "Wetness=%.4f opacity=%.4f / max=%.4f", diagnosticWetness, diagnosticOpacity, StormConfig.wetDarkness),
+            String.format(java.util.Locale.ROOT, "Dry delay remaining=%.2fs", diagnosticDelay)
+        };
+    }
     private long lastFrameNanos;
     private float wetness;
     private float dryingDelayRemaining;
@@ -57,6 +70,11 @@ public final class WetSurfaceRenderer {
         World world = mc.theWorld;
         float rainStrength = world.isRaining() ? Math.max(0.0F, Math.min(1.0F, world.getRainStrength(event.partialTicks))) : 0.0F;
         float wetnessFactor = updateWetness(world, rainStrength);
+        diagnosticRainFlag = world.isRaining();
+        diagnosticRainStrength = rainStrength;
+        diagnosticWetness = wetnessFactor;
+        diagnosticOpacity = StormConfig.wetDarkness * wetnessFactor;
+        diagnosticDelay = dryingDelayRemaining;
         if (wetnessFactor <= 0.0F) return;
 
         int radius = StormConfig.wetRadius;
