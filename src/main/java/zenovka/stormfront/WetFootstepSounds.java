@@ -27,7 +27,9 @@ public final class WetFootstepSounds {
             System.out.println("[StormFront] Heard sound event: " + name);
             diagnosticEvents++;
         }
-        if (!(name.startsWith("step.") || name.contains(".step.") || name.startsWith("dig."))) return;
+        boolean step = name.startsWith("step.") || name.contains(".step.");
+        boolean dig = name.startsWith("dig.");
+        if (!step && !(dig && StormConfig.wetDigSounds)) return;
 
         Minecraft mc = Minecraft.getMinecraft();
         World world = mc.theWorld;
