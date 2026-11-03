@@ -10,7 +10,7 @@ public final class StormConfig {
     public static boolean wetFootsteps = true;
     public static boolean wetDigSounds = true;
     public static float wetFootstepVolume = 0.10F;
-    public static String[] rainPermeableBlocks = new String[] { "minecraft:cake" };
+    public static String[] rainPermeableBlocks = new String[] { "minecraft:cake", "te:gregtech.tileentity.plants.MultiTileEntityBush" };
     public static int wetRadius = 12;
     public static float wetDarkness = 0.15F;
     public static float wetRiseSeconds = 6.0F;
@@ -35,7 +35,7 @@ public final class StormConfig {
             wetDigSounds = cfg.get("wetness", "wetDigSounds", true, "Also layer damp sounds over dig.* events.").getBoolean(true);
             wetFootstepVolume = (float)cfg.get("wetness", "footstepVolume", 0.10, "Maximum wet footstep layer volume.").getDouble(0.15);
             rainPermeableBlocks = cfg.get("wetness", "rainPermeableBlocks", new String[] { "minecraft:cake" },
-                "Block registry IDs that let rain reach the ground below. Use modid:block for all metadata, or modid:block@3 for one metadata value.").getStringList();
+                "Rain-permeable blocks: modid:block (all metadata), modid:block@3 (one metadata), or te:fully.qualified.TileEntityClass (exact tile-entity class; e.g. GT6 berry bushes). Existing config files need the te: entry added manually.").getStringList();
             RainPermeability.configure(rainPermeableBlocks);
             wetRadius = cfg.get("wetness", "radiusBlocks", 12).getInt(12);
             wetDarkness = (float)cfg.get("wetness", "darkness", 0.15, "Overlay opacity: 0 = invisible, 1 = black.").getDouble(0.15);
