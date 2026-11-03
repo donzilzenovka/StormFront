@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.world.World;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -138,6 +139,7 @@ public final class WetSurfaceRenderer {
     // Treat small surface clutter as rain-permeable, not every non-full block.
     // Collision boxes are world-space and can be absent for decorative objects.
     private static boolean isSmallSurfaceObject(World world, Block block, int x, int y, int z, Material material) {
+        if (isGT6BerryBush(world, x, y, z)) return true;
         if (material == Material.plants || material == Material.vine || block instanceof BlockBush) return true;
         // Some modded berry bushes use non-plant materials and oversized collision boxes.
         // Keep this narrow: it only affects blocks whose registered ID identifies a berry bush.
@@ -154,6 +156,17 @@ public final class WetSurfaceRenderer {
         double depth = box.maxZ - box.minZ;
         // Only low, narrow clutter. Full-width slabs and larger structures remain barriers.
         return height <= 0.375 && width <= 0.75 && depth <= 0.75;
+    }
+
+    // GT6 berry bushes are multi-tile entities sharing a generic block registry ID.
+    // Match their actual tile implementation, including subclasses, without linking GT6.
+    private static boolean isGT6BerryBush(World world, int x, int y, int z) {
+        TileEntity tile = world.getTileEntity(x, y, z);
+        if (tile == null) return false;
+        for (Class<?> type = tile.getClass(); type != null; type = type.getSuperclass()) {
+            if ("gregtech.tileentity.plants.MultiTileEntityBush".equals(type.getName())) return true;
+        }
+        return false;
     }
 
     private static void vertex(Tessellator t, double x, double y, double z,
