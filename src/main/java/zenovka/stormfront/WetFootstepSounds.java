@@ -14,6 +14,7 @@ public final class WetFootstepSounds {
     private final WetSurfaceRenderer renderer;
     private boolean playingLayer;
     private int diagnosticEvents;
+    private long lastStepTick = Long.MIN_VALUE;
 
     public WetFootstepSounds(WetSurfaceRenderer renderer) {
         this.renderer = renderer;
@@ -27,7 +28,8 @@ public final class WetFootstepSounds {
             System.out.println("[StormFront] Heard sound event: " + name);
             diagnosticEvents++;
         }
-        boolean step = name.startsWith("step.") || name.contains(".step.");
+        boolean dynamicStep = name.startsWith("fs.") && (name.endsWith("_walk") || name.endsWith("_run") || name.endsWith("_wander"));
+        boolean step = name.startsWith("step.") || name.contains(".step.") || dynamicStep;
         boolean dig = name.startsWith("dig.");
         if (!step && !(dig && StormConfig.wetDigSounds)) return;
 
@@ -35,6 +37,10 @@ public final class WetFootstepSounds {
         World world = mc.theWorld;
         EntityPlayer player = mc.thePlayer;
         if (world == null || player == null) return;
+        // A second footstep event in the same tick is often the same movement
+        // reported by both vanilla and Dynamic Surroundings.
+        long tick = world.getTotalWorldTime();
+        if (step && tick == lastStepTick) return;
 
         ISound sound = event.sound;
         double x = sound.getXPosF();
@@ -60,6 +66,7 @@ public final class WetFootstepSounds {
             mc.getSoundHandler().playSound(new PositionedSoundRecord(
                 new ResourceLocation("stormfront", "wet_step"), volume,
                 0.96F + world.rand.nextFloat() * 0.08F, (float)x, (float)y, (float)z));
+            if (step) lastStepTick = tick;
             if (StormConfig.wetDiagnostics) System.out.println("[StormFront] Layered wet footstep: " + name + " volume=" + volume);
         } finally {
             playingLayer = false;
