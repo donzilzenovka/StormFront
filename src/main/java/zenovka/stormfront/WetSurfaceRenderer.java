@@ -28,6 +28,7 @@ public final class WetSurfaceRenderer {
             String.format(java.util.Locale.ROOT, "Dry delay remaining=%.2fs", diagnosticDelay)
         };
     }
+    public float currentWetness() { return wetness; }
     private long lastFrameNanos;
     private float wetness;
     private float dryingDelayRemaining;
