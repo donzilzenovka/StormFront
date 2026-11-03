@@ -2,6 +2,7 @@ package zenovka.stormfront;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -11,6 +12,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import org.lwjgl.opengl.GL11;
 
 public final class WetSurfaceRenderer {
+    // This is a deliberately simple, bounded visual prototype, not a chunk recolour.
     @SubscribeEvent
     public void render(RenderWorldLastEvent event) {
         if (!StormConfig.wetSurfaces) return;
@@ -39,7 +41,6 @@ public final class WetSurfaceRenderer {
 
         Tessellator t = Tessellator.instance;
         t.startDrawingQuads();
-        t.setColorRGBA_F(0.0F, 0.0F, 0.0F, StormConfig.wetDarkness);
         for (int x = cx - radius; x <= cx + radius; x++) {
             for (int z = cz - radius; z <= cz + radius; z++) {
                 if (!world.getChunkProvider().chunkExists(x >> 4, z >> 4)) continue;
@@ -47,17 +48,38 @@ public final class WetSurfaceRenderer {
                 if (biome == null || !biome.canSpawnLightningBolt()) continue;
                 int y = world.getPrecipitationHeight(x, z);
                 if (y <= 0 || y >= world.getActualHeight()) continue;
+
+                // Tall grass, flowers and vines can sit above the solid ground.
+                // Skip a few plant blocks without treating solid roofs as transparent.
+                for (int i = 0; i < 4 && y > 1; i++) {
+                    Block aboveGround = world.getBlock(x, y - 1, z);
+                    Material material = aboveGround.getMaterial();
+                    if (material != Material.plants && material != Material.vine) break;
+                    y--;
+                }
                 Block block = world.getBlock(x, y - 1, z);
                 if (block == null || !block.isOpaqueCube() || block.getRenderType() != 0) continue;
+
+                // Linear fade at the perimeter prevents a hard square following the camera.
+                // Inside the perimeter, every rain shower produces the same full wetness.
                 double surface = y + 0.003;
-                t.addVertex(x, surface, z);
-                t.addVertex(x, surface, z + 1);
-                t.addVertex(x + 1, surface, z + 1);
-                t.addVertex(x + 1, surface, z);
+                vertex(t, x, surface, z, cx, cz, radius);
+                vertex(t, x, surface, z + 1, cx, cz, radius);
+                vertex(t, x + 1, surface, z + 1, cx, cz, radius);
+                vertex(t, x + 1, surface, z, cx, cz, radius);
             }
         }
         t.draw();
         GL11.glPopMatrix();
         GL11.glPopAttrib();
+    }
+
+    private static void vertex(Tessellator t, double x, double y, double z,
+                               int cx, int cz, int radius) {
+        double distance = Math.max(Math.abs(x - (cx + 0.5)), Math.abs(z - (cz + 0.5)));
+        double fadeWidth = Math.max(2.0, radius * 0.35);
+        float fade = (float)Math.max(0.0, Math.min(1.0, (radius + 0.5 - distance) / fadeWidth));
+        t.setColorRGBA_F(0.0F, 0.0F, 0.0F, StormConfig.wetDarkness * fade);
+        t.addVertex(x, y, z);
     }
 }
